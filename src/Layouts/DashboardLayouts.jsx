@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/SideBar";
-
 const DashboardLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Set to false for closed by default
   return (
     <div className="flex">
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
@@ -18,5 +16,4 @@ const DashboardLayout = () => {
     </div>
   );
 };
-
 export default DashboardLayout;

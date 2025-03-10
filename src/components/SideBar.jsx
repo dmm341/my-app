@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaBars, FaChartBar, FaSignOutAlt, FaHome, FaUsers, FaFlag } from "react-icons/fa";
+import { FaBars, FaChartBar, FaSignOutAlt, FaHome, FaUsers,FaCashRegister,FaShoppingCart } from "react-icons/fa";
 import { Tooltip } from "react-tooltip"; // Import Tooltip
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
@@ -24,6 +24,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="text-white hover:text-green-300 focus:outline-none"
+            data-tooltip-id="sidebar-tooltip" // Add tooltip ID
+            data-tooltip-content="Toggle Sidebar" // Add tooltip content
           >
             <FaBars size={24} />
           </button>
@@ -31,27 +33,53 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
         {/* Navigation Links */}
         <nav className="mt-10 inline-block flex-col space-y-4">
-          <Link to="/dashboard" className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition">
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
+            data-tooltip-id="sidebar-tooltip" // Add tooltip ID
+            data-tooltip-content="Dashboard" // Add tooltip content
+          >
             <FaHome size={20} />
             <span className={`${!isOpen && "hidden"}`}>Dashboard</span>
           </Link>
+          <Link
+            to="/dashboard/NewSale"
+            className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
+            data-tooltip-id="sidebar-tooltip" // Add tooltip ID
+            data-tooltip-content="new sale" // Add tooltip content
+          >
+            <FaShoppingCart size={20} />
+            <span className={`${!isOpen && "hidden"}`}>new sale</span>
+          </Link>
 
-          <Link to="/dashboard/analytics" className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition">
+
+          <Link
+            to="/dashboard/analytics"
+            className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
+            data-tooltip-id="sidebar-tooltip" // Add tooltip ID
+            data-tooltip-content="Analytics" // Add tooltip content
+          >
             <FaChartBar size={20} />
             <span className={`${!isOpen && "hidden"}`}>Analytics</span>
           </Link>
 
-          <Link to="/dashboard/Farmers" className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition">
+          <Link
+            to="/dashboard/Farmers"
+            className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
+            data-tooltip-id="sidebar-tooltip" // Add tooltip ID
+            data-tooltip-content="Farmers" // Add tooltip content
+          >
             <FaUsers size={20} />
             <span className={`${!isOpen && "hidden"}`}>Farmers</span>
           </Link>
 
-          <Link to="/destination" className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition">
-            <FaFlag size={20} />
-            <span className={`${!isOpen && "hidden"}`}>Destination</span>
-          </Link>
-
-          <button onClick={handleLogout} className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-red-600 transition">
+          
+          <button
+            onClick={handleLogout}
+            className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-red-600 transition"
+            data-tooltip-id="sidebar-tooltip" // Add tooltip ID
+            data-tooltip-content="Logout" // Add tooltip content
+          >
             <FaSignOutAlt size={20} />
             <span className={`${!isOpen && "hidden"}`}>Logout</span>
           </button>

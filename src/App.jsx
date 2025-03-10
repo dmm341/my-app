@@ -8,6 +8,7 @@ import Dashboard from "./components/Pages/Dashboard";
 import Analytics from "./components/Pages/Analytics";
 import NotFound from "./components/NotFound"; // Add this component
 import Farmers from "./components/Pages/Farmers";
+import NewSale from "./components/Pages/NewSale";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/overview" element={<Dashboard />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
   <Route index element={<Dashboard />} />
+  <Route path="NewSale" element={<NewSale />} />
   <Route path="analytics" element={<Analytics />} />
   <Route path="farmers" element={<Farmers />} />
 </Route>
