@@ -22,10 +22,12 @@ const Dashboard = () => {
     }
   };
 
-  // Re-fetch data when `refresh` changes
-  useEffect(() => {
-    fetchFarmers();
-  }, [refresh]);
+  // Fetch farmers data and re-fetch when `refresh` state changes
+useEffect(() => {
+  setLoading(true);
+  fetchFarmers();
+}, [refresh]); // ✅ Add refresh as a dependency
+
 
   // Calculate totals
   const totalFarmers = farmers.length;

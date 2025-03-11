@@ -6,6 +6,7 @@ const Farmers = () => {
   const [farmers, setFarmers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState(null);
+  const [refresh, setRefresh] = useState(false);
   const [sortOrder, setSortOrder] = useState("asc");
   const [newFarmer, setNewFarmer] = useState({
     name: "",
@@ -21,19 +22,21 @@ const Farmers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Fetch all farmers
-  useEffect(() => {
-    fetch("http://localhost:5000/farmers")
-      .then((res) => res.json())
-      .then((data) => {
-        setFarmers(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching farmers:", error);
-        setLoading(false);
-      });
-  }, []);
+  // Fetch all farmers and re-fetch when refresh state changes
+useEffect(() => {
+  setLoading(true);
+  fetch("http://localhost:5000/farmers")
+    .then((res) => res.json())
+    .then((data) => {
+      setFarmers(data);
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error("Error fetching farmers:", error);
+      setLoading(false);
+    });
+}, [refresh]); // ✅ Add refresh as a dependency
+
 
   // Filter farmers based on search input
   const filteredFarmers = farmers.filter((farmer) =>
@@ -207,6 +210,10 @@ const Farmers = () => {
     document.body.appendChild(link);
     link.click();
   };
+  const handleRefresh = () => {
+    setRefresh((prev) => !prev); // Toggle refresh state to trigger re-fetch
+  };
+  
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -266,10 +273,23 @@ const Farmers = () => {
           Sort by Money {sortField === "total_money" && (sortOrder === "asc" ? "⬆" : "⬇")}
         </button>
         <button
+  onClick={() => handleSort("id")}
+  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg shadow-md transition"
+>
+  Sort by ID {sortField === "id" && (sortOrder === "asc" ? "⬆" : "⬇")}
+</button>
+
+        <button
           onClick={exportToCSV}
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition"
         >
           Export to CSV
+        </button>
+        <button
+          onClick={handleRefresh}
+          className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg shadow-md transition"
+        >
+          🔄 Refresh Data
         </button>
       </div>
 
