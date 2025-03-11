@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaBars, FaChartBar, FaSignOutAlt, FaHome, FaUsers,FaCashRegister,FaShoppingCart } from "react-icons/fa";
+import { FaBars, FaChartBar, FaSignOutAlt, FaHome, FaUsers,FaTruck,FaShoppingCart } from "react-icons/fa";
 import { Tooltip } from "react-tooltip"; // Import Tooltip
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
@@ -15,7 +15,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       {/* Sidebar */}
       <div
         className={`bg-green-700 text-white h-screen p-5 flex flex-col fixed top-0 left-0 transition-all duration-300 ${
-          isOpen ? "w-64" : "w-16"
+          isOpen ? "w-64" : "w-[80px]"
         }`}
       >
         {/* Sidebar Header */}
@@ -32,10 +32,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         </div>
 
         {/* Navigation Links */}
-        <nav className="mt-10 inline-block flex-col space-y-4">
+        <nav className="mt-10 flex flex-col space-y-4">
           <Link
             to="/dashboard"
-            className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
+            className="flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
             data-tooltip-id="sidebar-tooltip" // Add tooltip ID
             data-tooltip-content="Dashboard" // Add tooltip content
           >
@@ -46,13 +46,20 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             to="/dashboard/NewSale"
             className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
             data-tooltip-id="sidebar-tooltip" // Add tooltip ID
-            data-tooltip-content="new sale" // Add tooltip content
+            data-tooltip-content="new order" // Add tooltip content
           >
             <FaShoppingCart size={20} />
             <span className={`${!isOpen && "hidden"}`}>new sale</span>
           </Link>
-
-
+          <Link
+            to="/dashboard/Buyers"
+            className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
+            data-tooltip-id="sidebar-tooltip" // Add tooltip ID
+            data-tooltip-content="Buyer" // Add tooltip content
+          >
+            <FaTruck size={20} />
+            <span className={`${!isOpen && "hidden"}`}>Buyer</span>
+          </Link>
           <Link
             to="/dashboard/analytics"
             className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
