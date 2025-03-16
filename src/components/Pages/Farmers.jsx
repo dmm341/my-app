@@ -464,7 +464,7 @@ useEffect(() => {
       </div>
 
       {/* Toast Notifications */}
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={300} />
     </div>
   );
 };

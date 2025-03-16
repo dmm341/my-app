@@ -8,8 +8,9 @@ import Dashboard from "./components/Pages/Dashboard";
 import Analytics from "./components/Pages/Analytics";
 import NotFound from "./components/NotFound"; // Add this component
 import Farmers from "./components/Pages/Farmers";
-import NewSale from "./components/Pages/NewOrder";
+import NewOrder from "./components/Pages/NewOrder";
 import Buyers from "./components/Pages/Buyers";
+import NewSale from "./components/Pages/NewSale";
 
 const App = () => {
   return (
@@ -21,10 +22,11 @@ const App = () => {
         <Route path="/overview" element={<Dashboard />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
   <Route index element={<Dashboard />} />
-  <Route path="NewSale" element={<NewSale />} />
+  <Route path="NewOrder" element={<NewOrder/>} />
   <Route path="analytics" element={<Analytics />} />
   <Route path="farmers" element={<Farmers />} />
   <Route path="Buyers" element={<Buyers />} />
+  <Route path="NewSale" element={<NewSale />} />
 </Route>
 
         <Route path="*" element={<NotFound />} />

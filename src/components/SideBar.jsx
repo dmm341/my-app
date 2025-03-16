@@ -43,10 +43,19 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             <span className={`${!isOpen && "hidden"}`}>Dashboard</span>
           </Link>
           <Link
-            to="/dashboard/NewSale"
+            to="/dashboard/NewOrder"
             className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
             data-tooltip-id="sidebar-tooltip" // Add tooltip ID
             data-tooltip-content="new order" // Add tooltip content
+          >
+            <FaShoppingCart size={20} />
+            <span className={`${!isOpen && "hidden"}`}>now order</span>
+          </Link>
+          <Link
+            to="/dashboard/NewSale"
+            className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
+            data-tooltip-id="sidebar-tooltip" // Add tooltip ID
+            data-tooltip-content="new sale" // Add tooltip content
           >
             <FaShoppingCart size={20} />
             <span className={`${!isOpen && "hidden"}`}>new sale</span>
@@ -60,15 +69,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             <FaTruck size={20} />
             <span className={`${!isOpen && "hidden"}`}>Buyer</span>
           </Link>
-          <Link
-            to="/dashboard/analytics"
-            className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
-            data-tooltip-id="sidebar-tooltip" // Add tooltip ID
-            data-tooltip-content="Analytics" // Add tooltip content
-          >
-            <FaChartBar size={20} />
-            <span className={`${!isOpen && "hidden"}`}>Analytics</span>
-          </Link>
+          
 
           <Link
             to="/dashboard/Farmers"
@@ -78,6 +79,15 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           >
             <FaUsers size={20} />
             <span className={`${!isOpen && "hidden"}`}>Farmers</span>
+          </Link>
+          <Link
+            to="/dashboard/analytics"
+            className="inline-flex items-center space-x-3 p-3 rounded-lg hover:bg-green-600 transition"
+            data-tooltip-id="sidebar-tooltip" // Add tooltip ID
+            data-tooltip-content="Analytics" // Add tooltip content
+          >
+            <FaChartBar size={20} />
+            <span className={`${!isOpen && "hidden"}`}>Analytics</span>
           </Link>
 
           

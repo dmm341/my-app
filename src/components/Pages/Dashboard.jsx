@@ -110,7 +110,7 @@ useEffect(() => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
-          <Tooltip />
+           <Tooltip /> 
           <Bar dataKey="fruits" fill="#4CAF50" />
         </BarChart>
       </div>
