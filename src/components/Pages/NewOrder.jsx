@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { FaCashRegister } from "react-icons/fa";
-
+import { url } from "../../utils/baseUrl";
 const NewOrder = () => {
   const [farmers, setFarmers] = useState([]); // List of farmers for dropdown
   const [selectedFarmer, setSelectedFarmer] = useState(""); // Farmer ID
   const [customerName, setCustomerName] = useState(""); // Farmer's Name (Auto-filled)
-  const [numberOfFruits, setNumberOfFruits] = useState(0);
-  const [pricePerFruit, setPricePerFruit] = useState(0);
+  const [numberOfFruits, setNumberOfFruits] = useState(1);
+  const [pricePerFruit, setPricePerFruit] = useState(1);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [ShowForm, setShowForm] = useState(false);
+  const[OrderDate, setOrderDate] =useState();
   const [orders, setOrders] = useState([]); // List of orders
   const [editingOrder, setEditingOrder] = useState(null); // Track order being edited
 const [editNumberOfFruits, setEditNumberOfFruits] = useState(0);
@@ -16,7 +18,7 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
 
   // Fetch farmers from backend
   useEffect(() => {
-    fetch("http://localhost:5000/farmers")
+    fetch(`${url}/farmers`)
       .then((res) => res.json())
       .then((data) => setFarmers(data))
       .catch((error) => console.error("Error fetching farmers:", error));
@@ -24,7 +26,7 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
 
   // Fetch orders from backend
   const fetchOrders = () => {
-    fetch("http://localhost:5000/orders")
+    fetch(`${url}/orders`)
       .then((res) => res.json())
       .then((data) => setOrders(data))
       .catch((error) => console.error("Error fetching orders:", error));
@@ -43,7 +45,7 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedFarmer || numberOfFruits <= 0 || pricePerFruit <= 0) {
+    if (!selectedFarmer || numberOfFruits <= 1 || pricePerFruit <= 1) {
       alert("Please fill all fields correctly.");
       return;
     }
@@ -68,9 +70,9 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
         fetchOrders();
         setSelectedFarmer("");
         setCustomerName("");
-        setNumberOfFruits(0);
-        setPricePerFruit(0);
-        setTotalAmount(0);
+        setNumberOfFruits(1);
+        setPricePerFruit(1);
+        setTotalAmount("");
       } else {
         const errorData = await response.json();
         alert(`Failed to record order: ${errorData.message}`);
@@ -86,10 +88,11 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
       numberOfFruits: editNumberOfFruits,
       pricePerFruit: editPricePerFruit,
       totalAmount: editNumberOfFruits * editPricePerFruit,
+     
     };
   
     try {
-      const response = await fetch(`http://localhost:5000/orders/${orderId}`, {
+      const response = await fetch(`${url}/orders/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedOrder),
@@ -111,7 +114,7 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
     if (!window.confirm("Are you sure you want to delete this order?")) return;
   
     try {
-      const response = await fetch(`http://localhost:5000/orders/${orderId}`, {
+      const response = await fetch(`${url}/orders/${orderId}`, {
         method: "DELETE",
       });
   
@@ -131,9 +134,13 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
         <FaCashRegister size={28} />
         <span>New Order</span>
       </h2>
+      <button onClick={() => setShowForm(!ShowForm)} className="bg-blue-600 text-white px-6 py-3 rounded-lg mb-4">
+        {ShowForm ? "Hide Form" : "New order"}
+      </button>
       
-
+      
       {/* New Order Form */}
+      {ShowForm && (
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md mb-8">
         <div className="space-y-4">
           {/* Farmer Selection */}
@@ -164,7 +171,7 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
             <input
               type="number"
               value={numberOfFruits}
-              onChange={(e) => setNumberOfFruits(parseInt(e.target.value) || 0)}
+              onChange={(e) => setNumberOfFruits(parseInt(e.target.value) || 1)}
               className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-green-300"
               min="1"
               required
@@ -177,9 +184,9 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
             <input
               type="number"
               value={pricePerFruit}
-              onChange={(e) => setPricePerFruit(parseFloat(e.target.value) || 0)}
+              onChange={(e) => setPricePerFruit(parseFloat(e.target.value) || 1)}
               className="w-full p-3 border rounded-lg shadow-sm focus:ring focus:ring-green-300"
-              min="0"
+              min="1"
               step="0.01"
               required
             />
@@ -207,6 +214,7 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
           </div>
         </div>
       </form>
+      )}
 
       {/* Orders Table */}
       <div className="bg-white p-6 rounded-lg shadow-md">
@@ -220,6 +228,8 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
                 <th className="px-4 py-3 border">Number of Fruits</th>
                 <th className="px-4 py-3 border">Price per Fruit (Ksh)</th>
                 <th className="px-4 py-3 border">Total Amount (Ksh)</th>
+                <th className="px-4 py-3 border">order date</th>
+                <th className="px-4 py-3 border">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -227,6 +237,7 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
     <tr key={order.id} className="border text-center">
       <td className="px-4 py-3 border">{order.farmer_id}</td>
       <td className="px-4 py-3 border">{order.customer_name}</td>
+    
       <td className="px-4 py-3 border">
         {editingOrder === order.id ? (
           <input
@@ -252,6 +263,7 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
         )}
       </td>
       <td className="px-4 py-3 border">{order.total_amount}</td>
+      <td className="px-4 py-3 border">{new Date(order.order_date).toLocaleDateString("en-GB")}</td>
       <td className="px-4 py-3 border">
         {editingOrder === order.id ? (
           <button

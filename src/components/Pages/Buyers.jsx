@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { url } from "../../utils/baseUrl";
+import ReactPaginate from "react-paginate";
+import { FaSort, FaFileExport } from "react-icons/fa";
 
 const Buyers = () => {
   const [buyers, setBuyers] = useState([]);
@@ -10,6 +13,11 @@ const Buyers = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingBuyer, setEditingBuyer] = useState(null);
   const [newBuyer, setNewBuyer] = useState({ name: "", contact: "", location: "" });
+  const [loading, setLoading] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Fetch buyers on component mount
   useEffect(() => {
@@ -17,14 +25,17 @@ const Buyers = () => {
   }, []);
 
   const fetchBuyers = async () => {
+    setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/buyers");
+      const response = await fetch(`${url}/buyers`);
       if (!response.ok) throw new Error("Failed to fetch buyers");
       const data = await response.json();
       setBuyers(data);
     } catch (error) {
       console.error("Error fetching buyers:", error);
       toast.error("Failed to fetch buyers");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,11 +49,17 @@ const Buyers = () => {
   // Sort and filter buyers
   const sortedBuyers = [...buyers].sort((a, b) => {
     if (!sortField) return 0;
+
     const valueA = a[sortField];
     const valueB = b[sortField];
-    return sortOrder === "asc"
-      ? valueA.localeCompare(valueB)
-      : valueB.localeCompare(valueA);
+
+    if (typeof valueA === "number" && typeof valueB === "number") {
+      return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
+    } else {
+      return sortOrder === "asc"
+        ? String(valueA).localeCompare(String(valueB))
+        : String(valueB).localeCompare(String(valueA));
+    }
   });
 
   const filteredBuyers = sortedBuyers.filter((buyer) =>
@@ -51,32 +68,34 @@ const Buyers = () => {
       .includes(searchQuery.toLowerCase())
   );
 
+  // Pagination logic
+  const offset = currentPage * itemsPerPage;
+  const paginatedBuyers = filteredBuyers.slice(offset, offset + itemsPerPage);
+  const pageCount = Math.ceil(filteredBuyers.length / itemsPerPage);
+
+  // Handle page change
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
   // Save or update buyer
   const saveBuyer = async () => {
     if (!newBuyer.name || !newBuyer.contact || !newBuyer.location) {
       toast.error("Please fill all fields.");
       return;
     }
-  
-    const url = editingBuyer
-      ? `http://localhost:5000/buyers/${editingBuyer.id}`
-      : "http://localhost:5000/buyers";
+
     const method = editingBuyer ? "PUT" : "POST";
-  
-      
+    const endpoint = editingBuyer ? `${url}/buyers/${editingBuyer.id}` : `${url}/buyers`;
+
     try {
-      const response = await fetch(url, {
+      const response = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newBuyer),
       });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Server response:", errorData); // ✅ Log response
-        throw new Error(errorData.message || "Failed to save buyer");
-      }
-  
+
+      if (!response.ok) throw new Error("Failed to save buyer");
       toast.success(`Buyer ${editingBuyer ? "updated" : "added"} successfully!`);
       fetchBuyers();
       resetForm();
@@ -85,13 +104,13 @@ const Buyers = () => {
       toast.error(error.message);
     }
   };
-  
+
   // Delete buyer
   const deleteBuyer = async (id) => {
     if (!window.confirm("Are you sure you want to delete this buyer?")) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/buyers/${id}`, { method: "DELETE" });
+      const response = await fetch(`${url}/buyers/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Failed to delete buyer");
       toast.success("Buyer deleted successfully!");
       fetchBuyers();
@@ -113,6 +132,31 @@ const Buyers = () => {
     setNewBuyer({ name: "", contact: "", location: "" });
     setEditingBuyer(null);
     setShowForm(false);
+  };
+
+  // Export to CSV
+  const exportToCSV = () => {
+    const headers = ["Name", "Contact", "Location", "Total Fruits", "Total Money"];
+    const data = buyers.map((buyer) => [
+      buyer.name,
+      buyer.contact,
+      buyer.location,
+      buyer.total_fruits,
+      buyer.total_money,
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      headers.join(",") +
+      "\n" +
+      data.map((row) => row.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "buyers.csv");
+    document.body.appendChild(link);
+    link.click();
   };
 
   return (
@@ -137,24 +181,11 @@ const Buyers = () => {
           ➕ Add Buyer
         </button>
         <button
-          onClick={() => handleSort("name")}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition"
+          onClick={exportToCSV}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md transition flex items-center"
         >
-          Sort by Name {sortField === "name" && (sortOrder === "asc" ? "⬆" : "⬇")}
+          <FaFileExport className="mr-2" /> Export to CSV
         </button>
-        <button
-          onClick={() => handleSort("name")}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition"
-        >
-          Sort by total_fruits{sortField === "total_fruits" && (sortOrder === "asc" ? "⬆" : "⬇")}
-        </button>
-        <button
-          onClick={() => handleSort("name")}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md transition"
-        >
-          Sort by total_money{sortField === "total_money" && (sortOrder === "asc" ? "⬆" : "⬇")}
-        </button>
-        
       </div>
 
       {/* Add/Edit Buyer Form */}
@@ -185,7 +216,6 @@ const Buyers = () => {
               onChange={(e) => setNewBuyer({ ...newBuyer, location: e.target.value })}
               className="p-3 border rounded-lg w-full shadow-sm"
             />
-            
           </div>
           <div className="mt-4 flex justify-end space-x-4">
             <button
@@ -209,28 +239,43 @@ const Buyers = () => {
         <table className="w-full border border-green-400 shadow-md rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-green-700 text-white border border-gray-400">
-              <th className="px-4 py-3 border">Name</th>
-              <th className="px-4 py-3 border">Contact</th>
-              <th className="px-4 py-3 border">Location</th>
-              <th className="px-4 py-3 border"> total fruits</th>
-              <th className="px-4 py-3 border"> total money</th>
+              <th className="px-4 py-3 border cursor-pointer" onClick={() => handleSort("name")}>
+                Name <FaSort className="inline" />
+              </th>
+              <th className="px-4 py-3 border cursor-pointer" onClick={() => handleSort("contact")}>
+                Contact <FaSort className="inline" />
+              </th>
+              <th className="px-4 py-3 border cursor-pointer" onClick={() => handleSort("location")}>
+                Location <FaSort className="inline" />
+              </th>
+              <th className="px-4 py-3 border cursor-pointer" onClick={() => handleSort("total_fruits")}>
+                Total Fruits <FaSort className="inline" />
+              </th>
+              <th className="px-4 py-3 border cursor-pointer" onClick={() => handleSort("total_money")}>
+                Total Money <FaSort className="inline" />
+              </th>
               <th className="px-4 py-3 border">Actions</th>
-              
             </tr>
           </thead>
           <tbody>
-            {filteredBuyers.map((buyer) => (
-              <tr key={buyer.id} className="border text-center">
+            {paginatedBuyers.map((buyer) => (
+              <tr key={buyer.id} className="border text-center hover:bg-gray-50 transition duration-200">
                 <td className="px-4 py-3 border">{buyer.name}</td>
                 <td className="px-4 py-3 border">{buyer.contact}</td>
                 <td className="px-4 py-3 border">{buyer.location}</td>
                 <td className="px-4 py-3 border">{buyer.total_fruits}</td>
                 <td className="px-4 py-3 border">{buyer.total_money}</td>
                 <td className="px-4 py-3 border">
-                  <button onClick={() => editBuyer(buyer)} className="bg-yellow-500 text-white px-2 py-1 rounded">
+                  <button
+                    onClick={() => editBuyer(buyer)}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2"
+                  >
                     Edit
                   </button>
-                  <button onClick={() => deleteBuyer(buyer.id)} className="bg-red-500 text-white px-2 py-1 rounded ml-2">
+                  <button
+                    onClick={() => deleteBuyer(buyer.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+                  >
                     Delete
                   </button>
                 </td>
@@ -239,7 +284,23 @@ const Buyers = () => {
           </tbody>
         </table>
       </div>
-      <ToastContainer />
+
+      {/* Pagination */}
+      <ReactPaginate
+        previousLabel={"Previous"}
+        nextLabel={"Next"}
+        pageCount={pageCount}
+        onPageChange={handlePageClick}
+        containerClassName={"flex justify-center mt-6 space-x-2"}
+        previousClassName={"bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"}
+        nextClassName={"bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"}
+        pageClassName={"bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"}
+        activeClassName={"bg-green-600 text-white"}
+        disabledClassName={"bg-gray-300 text-gray-500 cursor-not-allowed"}
+      />
+
+      {/* Toast Notifications */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

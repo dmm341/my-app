@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaBars, FaChartBar, FaSignOutAlt, FaHome, FaUsers,FaTruck,FaShoppingCart } from "react-icons/fa";
+import { FaBars, FaChartBar, FaSignOutAlt, FaHome, FaUsers,FaTruck,FaShoppingCart,FaCashRegister } from "react-icons/fa";
 import { Tooltip } from "react-tooltip"; // Import Tooltip
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
@@ -57,7 +57,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             data-tooltip-id="sidebar-tooltip" // Add tooltip ID
             data-tooltip-content="new sale" // Add tooltip content
           >
-            <FaShoppingCart size={20} />
+            <FaCashRegister size={20} />
             <span className={`${!isOpen && "hidden"}`}>new sale</span>
           </Link>
           <Link
