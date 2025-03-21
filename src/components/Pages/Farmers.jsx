@@ -321,39 +321,6 @@ useEffect(() => {
               onChange={(e) => setNewFarmer({ ...newFarmer, location: e.target.value })}
               className="p-3 border rounded-lg w-full shadow-sm"
             />
-            <select
-              value={newFarmer.avocado_type}
-              onChange={(e) => setNewFarmer({ ...newFarmer, avocado_type: e.target.value })}
-              className="p-3 border rounded-lg w-full shadow-sm"
-            >
-              <option value="Hass">Hass</option>
-              <option value="Fuerte">Fuerte</option>
-              <option value="Both">Both</option>
-            </select>
-            <input
-              type="number"
-              placeholder="Total Fruits"
-              value={newFarmer.total_fruits === 0 ? "" : newFarmer.total_fruits}
-              onChange={(e) =>
-                setNewFarmer({
-                  ...newFarmer,
-                  total_fruits: parseInt(e.target.value) || 0,
-                })
-              }
-              className="p-3 border rounded-lg w-full shadow-sm"
-            />
-            <input
-              type="number"
-              placeholder="Total Money"
-              value={newFarmer.total_money === 0.0 ? "" : newFarmer.total_money}
-              onChange={(e) =>
-                setNewFarmer({
-                  ...newFarmer,
-                  total_money: parseFloat(e.target.value) || 0.0,
-                })
-              }
-              className="p-3 border rounded-lg w-full shadow-sm"
-            />
           </div>
           <div className="mt-4 flex justify-end space-x-4">
             <button

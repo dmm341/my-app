@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaCashRegister } from "react-icons/fa";
 import { url } from "../../utils/baseUrl";
+import ReactPaginate from "react-paginate";
 const NewOrder = () => {
   const [farmers, setFarmers] = useState([]); // List of farmers for dropdown
   const [selectedFarmer, setSelectedFarmer] = useState(""); // Farmer ID
@@ -14,6 +15,8 @@ const NewOrder = () => {
   const [editingOrder, setEditingOrder] = useState(null); // Track order being edited
 const [editNumberOfFruits, setEditNumberOfFruits] = useState(0);
 const [editPricePerFruit, setEditPricePerFruit] = useState(0);
+const [currentPage, setCurrentPage] = useState(0);
+const [itemsPerPage, setItemsPerPage] = useState(10);
 
 
   // Fetch farmers from backend
@@ -72,7 +75,8 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
         setCustomerName("");
         setNumberOfFruits(1);
         setPricePerFruit(1);
-        setTotalAmount("");
+        setTotalAmount(0);
+        setShowForm(false);
       } else {
         const errorData = await response.json();
         alert(`Failed to record order: ${errorData.message}`);
@@ -127,6 +131,15 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
     } catch (error) {
       console.error("Error deleting order:", error);
     }
+  };
+  // Pagination logic
+  const offset = currentPage * itemsPerPage;
+  const paginatedorders = orders.slice(offset, offset + itemsPerPage);
+  const pageCount = Math.ceil(orders.length / itemsPerPage);
+
+  // Handle page change
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected);
   };
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -233,7 +246,7 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
               </tr>
             </thead>
             <tbody>
-  {orders.map((order) => (
+  {paginatedorders.map((order) => (
     <tr key={order.id} className="border text-center">
       <td className="px-4 py-3 border">{order.farmer_id}</td>
       <td className="px-4 py-3 border">{order.customer_name}</td>
@@ -296,7 +309,27 @@ const [editPricePerFruit, setEditPricePerFruit] = useState(0);
 </tbody>
 
           </table>
+          <button
+        className="bg-green-300 px-2 py-2 ml-4 mt-3 rounded"
+        onClick={() => {
+          setItemsPerPage(itemsPerPage === 10 ? 5 : 10);
+        }}
+      >
+        {itemsPerPage === 5 ? "more" : "less"}
+      </button>
         </div>
+        <ReactPaginate
+              previousLabel={"Previous"}
+              nextLabel={"Next"}
+              pageCount={pageCount}
+              onPageChange={handlePageClick}
+              containerClassName={"flex justify-center mt-6 space-x-2"}
+              previousClassName={"bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"}
+              nextClassName={"bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"}
+              pageClassName={"bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg"}
+              activeClassName={"bg-green-600 text-white"}
+              disabledClassName={"bg-gray-300 text-gray-500 cursor-not-allowed"}
+            />
       </div>
     </div>
   );
