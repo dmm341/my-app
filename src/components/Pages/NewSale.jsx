@@ -16,14 +16,13 @@ const NewSale = () => {
   const [editingSale, setEditingSale] = useState(null);
   const [editNumberOfFruits, setEditNumberOfFruits] = useState(0);
   const [editPricePerFruit, setEditPricePerFruit] = useState(0);
+  const [editBuyerId, setEditBuyerId] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [sortField, setSortField] = useState("sale_date");
-  const [sortOrder, setSortOrder] = useState("desc");
   const [loading, setLoading] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Items per page
+  const [itemsPerPage] = useState(10);
 
   // Fetch buyers and sales on component mount
   useEffect(() => {
@@ -55,20 +54,12 @@ const NewSale = () => {
     setTotalAmount(numberOfFruits * pricePerFruit);
   }, [numberOfFruits, pricePerFruit]);
 
-  // Handle sorting
-  const handleSort = (field) => {
-    const order = sortField === field && sortOrder === "asc" ? "desc" : "asc";
-    setSortField(field);
-    setSortOrder(order);
-
-    const sortedSales = [...sales].sort((a, b) => {
-      if (order === "asc") {
-        return a[field] > b[field] ? 1 : -1;
-      } else {
-        return a[field] < b[field] ? 1 : -1;
-      }
-    });
-    setSales(sortedSales);
+  // Initialize edit mode
+  const handleEditInit = (sale) => {
+    setEditingSale(sale.id);
+    setEditBuyerId(String(sale.buyer_id));
+    setEditNumberOfFruits(sale.number_of_fruits);
+    setEditPricePerFruit(sale.price_per_fruit);
   };
 
   // Handle form submission
@@ -89,25 +80,14 @@ const NewSale = () => {
     };
 
     try {
-      let response;
-      if (editingSale) {
-        // Update an existing sale
-        response = await fetch(`${url}/sales/${editingSale}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(saleData),
-        });
-      } else {
-        // Create a new sale
-        response = await fetch(`${url}/sales`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(saleData),
-        });
-      }
+      const response = await fetch(`${url}/sales`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(saleData),
+      });
 
       if (response.ok) {
-        toast.success(editingSale ? "Sale updated successfully!" : "Sale recorded successfully!");
+        toast.success("Sale recorded successfully!");
         fetchSales();
         resetForm();
       } else {
@@ -121,11 +101,17 @@ const NewSale = () => {
 
   // Handle edit sale
   const handleEditSale = async (saleId) => {
+    if (!editBuyerId || editNumberOfFruits <= 0 || editPricePerFruit <= 0) {
+      toast.error("Please fill all fields correctly.");
+      return;
+    }
+
     const updatedSale = {
-      buyerId: selectedBuyer,
+      buyerId: parseInt(editBuyerId),
       numberOfFruits: editNumberOfFruits,
       pricePerFruit: editPricePerFruit,
       totalAmount: editNumberOfFruits * editPricePerFruit,
+      saleDate: sales.find(s => s.id === saleId)?.sale_date || new Date().toISOString().split('T')[0]
     };
 
     try {
@@ -139,11 +125,18 @@ const NewSale = () => {
         toast.success("Sale updated successfully!");
         setEditingSale(null);
         fetchSales();
+        
+        // Refresh buyers data
+        const buyersResponse = await fetch(`${url}/buyers`);
+        const buyersData = await buyersResponse.json();
+        setBuyers(buyersData);
       } else {
-        toast.error("Failed to update sale.");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update sale");
       }
     } catch (error) {
       console.error("Error updating sale:", error);
+      toast.error(error.message);
     }
   };
 
@@ -171,11 +164,10 @@ const NewSale = () => {
   // Reset form
   const resetForm = () => {
     setSelectedBuyer("");
-    setNumberOfFruits(0);
-    setPricePerFruit(0);
-    setTotalAmount(0);
+    setNumberOfFruits(1);
+    setPricePerFruit(1);
+    setTotalAmount(1);
     setSaleDate("");
-    setEditingSale(null);
     setShowForm(false);
   };
 
@@ -203,28 +195,6 @@ const NewSale = () => {
       >
         {showForm ? "Hide Form" : "New Sale"}
       </button>
-
-      {/* Sorting Buttons */}
-      <div className="mb-4 flex space-x-4">
-        <button
-          onClick={() => handleSort("sale_date")}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-300"
-        >
-          Sort by Date
-        </button>
-        <button
-          onClick={() => handleSort("number_of_fruits")}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-300"
-        >
-          Sort by Fruits
-        </button>
-        <button
-          onClick={() => handleSort("total_amount")}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-300"
-        >
-          Sort by Amount
-        </button>
-      </div>
 
       {/* Add/Edit Sale Form */}
       {showForm && (
@@ -305,7 +275,7 @@ const NewSale = () => {
               type="submit"
               className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold text-lg transition duration-300"
             >
-              {editingSale ? "Update Sale" : "Record Sale"}
+              Record Sale
             </button>
           </div>
         </form>
@@ -335,14 +305,31 @@ const NewSale = () => {
                 <tbody>
                   {paginatedSales.map((sale) => (
                     <tr key={sale.id} className="border hover:bg-gray-50 transition duration-200">
-                      <td className="px-4 py-3 border">{sale.buyer_name}</td>
+                      <td className="px-4 py-3 border">
+                        {editingSale === sale.id ? (
+                          <select
+                            value={editBuyerId}
+                            onChange={(e) => setEditBuyerId(e.target.value)}
+                            className="w-full p-2 border rounded"
+                          >
+                            {buyers.map((buyer) => (
+                              <option key={buyer.id} value={String(buyer.id)}>
+                                {buyer.name}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          sale.buyer_name
+                        )}
+                      </td>
                       <td className="px-4 py-3 border">
                         {editingSale === sale.id ? (
                           <input
                             type="number"
                             value={editNumberOfFruits}
-                            onChange={(e) => setEditNumberOfFruits(parseInt(e.target.value))}
-                            className="w-16 border p-1 text-center"
+                            onChange={(e) => setEditNumberOfFruits(parseInt(e.target.value) || 0)}
+                            className="w-20 border p-1 text-center"
+                            min="1"
                           />
                         ) : (
                           sale.number_of_fruits
@@ -353,41 +340,57 @@ const NewSale = () => {
                           <input
                             type="number"
                             value={editPricePerFruit}
-                            onChange={(e) => setEditPricePerFruit(parseFloat(e.target.value))}
-                            className="w-16 border p-1 text-center"
+                            onChange={(e) => setEditPricePerFruit(parseFloat(e.target.value) || 0)}
+                            className="w-20 border p-1 text-center"
+                            min="0.01"
+                            step="0.01"
                           />
                         ) : (
                           sale.price_per_fruit
                         )}
                       </td>
-                      <td className="px-4 py-3 border">{sale.total_amount}</td>
-                      <td className="px-4 py-3 border">{new Date(sale.sale_date).toLocaleDateString("en-GB")}</td>
                       <td className="px-4 py-3 border">
                         {editingSale === sale.id ? (
-                          <button
-                            className="bg-blue-500 text-white px-2 py-1 rounded"
-                            onClick={() => handleEditSale(sale.id)}
-                          >
-                            Save
-                          </button>
+                          (editNumberOfFruits * editPricePerFruit).toFixed(2)
                         ) : (
-                          <button
-                            className="bg-yellow-500 text-white px-2 py-1 rounded"
-                            onClick={() => {
-                              setEditingSale(sale.id);
-                              setEditNumberOfFruits(sale.number_of_fruits);
-                              setEditPricePerFruit(sale.price_per_fruit);
-                            }}
-                          >
-                            Edit
-                          </button>
+                          sale.total_amount
                         )}
-                        <button
-                          className="bg-red-500 text-white px-2 py-1 ml-2 rounded"
-                          onClick={() => handleDelete(sale.id)}
-                        >
-                          Delete
-                        </button>
+                      </td>
+                      <td className="px-4 py-3 border">
+                        {new Date(sale.sale_date).toLocaleDateString("en-GB")}
+                      </td>
+                      <td className="px-4 py-3 border">
+                        {editingSale === sale.id ? (
+                          <>
+                            <button
+                              className="bg-green-500 text-white px-3 py-1 rounded mr-2"
+                              onClick={() => handleEditSale(sale.id)}
+                            >
+                              Save
+                            </button>
+                            <button
+                              className="bg-gray-500 text-white px-3 py-1 rounded"
+                              onClick={() => setEditingSale(null)}
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              className="bg-yellow-500 text-white px-3 py-1 rounded mr-2"
+                              onClick={() => handleEditInit(sale)}
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              className="bg-red-500 text-white px-3 py-1 rounded"
+                              onClick={() => handleDelete(sale.id)}
+                            >
+                              <FaTrash />
+                            </button>
+                          </>
+                        )}
                       </td>
                     </tr>
                   ))}

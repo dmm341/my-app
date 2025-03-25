@@ -368,7 +368,9 @@ useEffect(() => {
                   <td className="px-4 py-3 border">{farmer.location}</td>
                   <td className="px-4 py-3 border">{farmer.avocado_type}</td>
                   <td className="px-4 py-3 border">{farmer.total_fruits}</td>
-                  <td className="px-4 py-3 border">Ksh{farmer.total_money}</td>
+                  <td className="px-4 py-3 border">
+                    Ksh{farmer.total_money ? farmer.total_money.toFixed(2) : "0.00"}
+                  </td>
                   <td className="px-4 py-3 border">
                     <button
                       onClick={() => editFarmer(farmer)}

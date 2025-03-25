@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FaUsers, FaShoppingBasket, FaMoneyBillWave } from "react-icons/fa";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
@@ -7,7 +7,6 @@ const Dashboard = () => {
   const [farmers, setFarmers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false); // Refresh state to trigger re-fetch
-  const navigate = useNavigate();
 
   // Fetch farmers data
   const fetchFarmers = async () => {
@@ -23,11 +22,10 @@ const Dashboard = () => {
   };
 
   // Fetch farmers data and re-fetch when `refresh` state changes
-useEffect(() => {
-  setLoading(true);
-  fetchFarmers();
-}, [refresh]); // ✅ Add refresh as a dependency
-
+  useEffect(() => {
+    setLoading(true);
+    fetchFarmers();
+  }, [refresh]);
 
   // Calculate totals
   const totalFarmers = farmers.length;
@@ -65,7 +63,7 @@ useEffect(() => {
           <div className="flex items-center space-x-4">
             <FaShoppingBasket className="text-4xl text-green-700" />
             <div>
-              <p className="text-gray-600">Total Fruits</p>
+              <p className="text-gray-600">Total Fruits Purchased</p>
               <p className="text-2xl font-bold text-green-700">{totalFruits}</p>
             </div>
           </div>
@@ -74,7 +72,7 @@ useEffect(() => {
           <div className="flex items-center space-x-4">
             <FaMoneyBillWave className="text-4xl text-green-700" />
             <div>
-              <p className="text-gray-600">Total Money</p>
+              <p className="text-gray-600">Total purchases</p>
               <p className="text-2xl font-bold text-green-700">Ksh{totalMoney.toFixed(2)}</p>
             </div>
           </div>
@@ -110,7 +108,7 @@ useEffect(() => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
-           <Tooltip /> 
+          <Tooltip />
           <Bar dataKey="fruits" fill="#4CAF50" />
         </BarChart>
       </div>
