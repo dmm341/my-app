@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { FaCashRegister } from "react-icons/fa";
 import { url } from "../../utils/baseUrl";
 import ReactPaginate from "react-paginate";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 
 const NewOrder = ({ onOrderUpdated }) => {
   const [farmers, setFarmers] = useState([]);
@@ -48,7 +50,7 @@ const NewOrder = ({ onOrderUpdated }) => {
     e.preventDefault();
 
     if (!selectedFarmer || numberOfFruits < 1 || pricePerFruit < 1) {
-      alert("Please fill all fields correctly.");
+      toast.error("Please fill all fields correctly.");
       return;
     }
 
@@ -68,7 +70,7 @@ const NewOrder = ({ onOrderUpdated }) => {
       });
 
       if (response.ok) {
-        alert("Order recorded successfully!");
+        toast.success("Order recorded successfully!");
         fetchOrders();
         setSelectedFarmer("");
         setCustomerName("");
@@ -81,16 +83,16 @@ const NewOrder = ({ onOrderUpdated }) => {
         }
       } else {
         const errorData = await response.json();
-        alert(`Failed to record order: ${errorData.message}`);
+        toast.error(`Failed to record order: ${errorData.message}`);
       }
     } catch (error) {
       console.error("Error recording order:", error);
-      alert("An error occurred while recording the order.");
+      toast.error("An error occurred while recording the order.");
     }
   };
   const handleEditOrder = async (orderId) => {
     if (editNumberOfFruits < 1 || editPricePerFruit < 1) {
-      alert("Please fill all fields correctly.");
+      toast.error("Please fill all fields correctly.");
       return;
     }
 
@@ -108,9 +110,10 @@ const NewOrder = ({ onOrderUpdated }) => {
       });
 
       if (response.ok) {
-        alert("Order updated successfully!");
+        toast.success("Order updated successfully!");
         setEditingOrder(null);
-        fetchOrders(); // Refresh orders
+        fetchOrders(); 
+        // Refresh orders
         fetch(`${url}/farmers`) // Refresh farmers
           .then((res) => res.json())
           .then(setFarmers)
@@ -119,7 +122,7 @@ const NewOrder = ({ onOrderUpdated }) => {
           onOrderUpdated(); // Trigger refresh in Dashboard
         }
       } else {
-        alert("Failed to update order.");
+        toast.error("Failed to update order.");
       }
     } catch (error) {
       console.error("Error updating order:", error);
@@ -136,7 +139,7 @@ const NewOrder = ({ onOrderUpdated }) => {
       });
 
       if (response.ok) {
-        alert("Order deleted successfully!");
+        toast.success("Order deleted successfully!");
         const deletedOrder = orders.find(order => order.id === orderId);
         if (deletedOrder) {
           const farmer = farmers.find(farmer => farmer.id === deletedOrder.farmer_id);
@@ -159,7 +162,7 @@ const NewOrder = ({ onOrderUpdated }) => {
           onOrderUpdated(); // Trigger refresh in Dashboard
         }
       } else {
-        alert("Failed to delete order.");
+        toast.error("Failed to delete order.");
       }
     } catch (error) {
       console.error("Error deleting order:", error);
@@ -359,6 +362,8 @@ const NewOrder = ({ onOrderUpdated }) => {
           disabledClassName={"bg-gray-300 text-gray-500 cursor-not-allowed"}
         />
       </div>
+      {/* Toast Notifications */}
+            <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

@@ -13,10 +13,12 @@ const NewSale = () => {
   const [totalAmount, setTotalAmount] = useState(1);
   const [saleDate, setSaleDate] = useState("");
   const [sales, setSales] = useState([]);
-  const [editingSale, setEditingSale] = useState(null);
-  const [editNumberOfFruits, setEditNumberOfFruits] = useState(0);
-  const [editPricePerFruit, setEditPricePerFruit] = useState(0);
-  const [editBuyerId, setEditBuyerId] = useState("");
+  const [editingSaleId, setEditingSaleId] = useState(null);
+  const [editForm, setEditForm] = useState({
+    numberOfFruits: 0,
+    pricePerFruit: 0,
+    totalAmount: 0
+  });
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -56,10 +58,12 @@ const NewSale = () => {
 
   // Initialize edit mode
   const handleEditInit = (sale) => {
-    setEditingSale(sale.id);
-    setEditBuyerId(String(sale.buyer_id));
-    setEditNumberOfFruits(sale.number_of_fruits);
-    setEditPricePerFruit(sale.price_per_fruit);
+    setEditingSaleId(sale.id);
+    setEditForm({
+      numberOfFruits: sale.number_of_fruits,
+      pricePerFruit: sale.price_per_fruit,
+      totalAmount: sale.total_amount
+    });
   };
 
   // Handle form submission
@@ -101,17 +105,15 @@ const NewSale = () => {
 
   // Handle edit sale
   const handleEditSale = async (saleId) => {
-    if (!editBuyerId || editNumberOfFruits <= 0 || editPricePerFruit <= 0) {
+    if (editForm.numberOfFruits <= 0 || editForm.pricePerFruit <= 0) {
       toast.error("Please fill all fields correctly.");
       return;
     }
 
     const updatedSale = {
-      buyerId: parseInt(editBuyerId),
-      numberOfFruits: editNumberOfFruits,
-      pricePerFruit: editPricePerFruit,
-      totalAmount: editNumberOfFruits * editPricePerFruit,
-      saleDate: sales.find(s => s.id === saleId)?.sale_date || new Date().toISOString().split('T')[0]
+      numberOfFruits: editForm.numberOfFruits,
+      pricePerFruit: editForm.pricePerFruit,
+      totalAmount: editForm.numberOfFruits * editForm.pricePerFruit
     };
 
     try {
@@ -123,20 +125,19 @@ const NewSale = () => {
 
       if (response.ok) {
         toast.success("Sale updated successfully!");
-        setEditingSale(null);
+        setEditingSaleId(null);
         fetchSales();
-        
         // Refresh buyers data
-        const buyersResponse = await fetch(`${url}/buyers`);
-        const buyersData = await buyersResponse.json();
-        setBuyers(buyersData);
+        fetch(`${url}/buyers`)
+          .then((res) => res.json())
+          .then(setBuyers)
+          .catch((error) => console.error("Error fetching buyers:", error));
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update sale");
+        toast.error("Failed to update sale.");
       }
     } catch (error) {
       console.error("Error updating sale:", error);
-      toast.error(error.message);
+      toast.error("An error occurred while updating the sale.");
     }
   };
 
@@ -303,98 +304,80 @@ const NewSale = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedSales.map((sale) => (
-                    <tr key={sale.id} className="border hover:bg-gray-50 transition duration-200">
-                      <td className="px-4 py-3 border">
-                        {editingSale === sale.id ? (
-                          <select
-                            value={editBuyerId}
-                            onChange={(e) => setEditBuyerId(e.target.value)}
-                            className="w-full p-2 border rounded"
-                          >
-                            {buyers.map((buyer) => (
-                              <option key={buyer.id} value={String(buyer.id)}>
-                                {buyer.name}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          sale.buyer_name
-                        )}
-                      </td>
-                      <td className="px-4 py-3 border">
-                        {editingSale === sale.id ? (
-                          <input
-                            type="number"
-                            value={editNumberOfFruits}
-                            onChange={(e) => setEditNumberOfFruits(parseInt(e.target.value) || 0)}
-                            className="w-20 border p-1 text-center"
-                            min="1"
-                          />
-                        ) : (
-                          sale.number_of_fruits
-                        )}
-                      </td>
-                      <td className="px-4 py-3 border">
-                        {editingSale === sale.id ? (
-                          <input
-                            type="number"
-                            value={editPricePerFruit}
-                            onChange={(e) => setEditPricePerFruit(parseFloat(e.target.value) || 0)}
-                            className="w-20 border p-1 text-center"
-                            min="0.01"
-                            step="0.01"
-                          />
-                        ) : (
-                          sale.price_per_fruit
-                        )}
-                      </td>
-                      <td className="px-4 py-3 border">
-                        {editingSale === sale.id ? (
-                          (editNumberOfFruits * editPricePerFruit).toFixed(2)
-                        ) : (
-                          sale.total_amount
-                        )}
-                      </td>
-                      <td className="px-4 py-3 border">
-                        {new Date(sale.sale_date).toLocaleDateString("en-GB")}
-                      </td>
-                      <td className="px-4 py-3 border">
-                        {editingSale === sale.id ? (
-                          <>
-                            <button
-                              className="bg-green-500 text-white px-3 py-1 rounded mr-2"
-                              onClick={() => handleEditSale(sale.id)}
-                            >
-                              Save
-                            </button>
-                            <button
-                              className="bg-gray-500 text-white px-3 py-1 rounded"
-                              onClick={() => setEditingSale(null)}
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              className="bg-yellow-500 text-white px-3 py-1 rounded mr-2"
-                              onClick={() => handleEditInit(sale)}
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              className="bg-red-500 text-white px-3 py-1 rounded"
-                              onClick={() => handleDelete(sale.id)}
-                            >
-                              <FaTrash />
-                            </button>
-                          </>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+  {paginatedSales.map((sale) => (
+    <tr key={sale.id} className="border text-center">
+      <td className="px-4 py-3 border">{sale.buyer_name}</td>
+      <td className="px-4 py-3 border">
+        {editingSaleId === sale.id ? (
+          <input
+            type="number"
+            value={editForm.numberOfFruits}
+            onChange={(e) => setEditForm({
+              ...editForm,
+              numberOfFruits: parseInt(e.target.value) || 0,
+              totalAmount: (parseInt(e.target.value) || 0) * editForm.pricePerFruit
+            })}
+            className="w-16 border p-1 text-center"
+            min="1"
+          />
+        ) : (
+          String(sale.number_of_fruits) // Ensure value is a string
+        )}
+      </td>
+      <td className="px-4 py-3 border">
+        {editingSaleId === sale.id ? (
+          <input
+            type="number"
+            value={editForm.pricePerFruit}
+            onChange={(e) => setEditForm({
+              ...editForm,
+              pricePerFruit: parseFloat(e.target.value) || 0,
+              totalAmount: editForm.numberOfFruits * (parseFloat(e.target.value) || 0)
+            })}
+            className="w-16 border p-1 text-center"
+            min="0.01"
+            step="0.01"
+          />
+        ) : (
+          String(sale.price_per_fruit) // Ensure value is a string
+        )}
+      </td>
+      <td className="px-4 py-3 border">{sale.total_amount}</td>
+      <td className="px-4 py-3 border">{new Date(sale.sale_date).toLocaleDateString("en-GB")}</td>
+      <td className="px-4 py-3 border">
+        {editingSaleId === sale.id ? (
+          <button
+            className="bg-blue-500 text-white px-2 py-1 rounded"
+            onClick={() => handleEditSale(sale.id)}
+          >
+            Save
+          </button>
+        ) : (
+          <button
+            className="bg-yellow-500 text-white px-2 py-1 rounded"
+            onClick={() => {
+              setEditingSaleId(sale.id);
+              setEditForm({
+                numberOfFruits: sale.number_of_fruits,
+                pricePerFruit: sale.price_per_fruit,
+                totalAmount: sale.total_amount,
+              });
+            }}
+          >
+            Edit
+          </button>
+        )}
+        <button
+          className="bg-red-500 text-white px-2 py-1 ml-2 rounded"
+          onClick={() => handleDelete(sale.id)}
+        >
+          Delete
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
               </table>
             </div>
 
