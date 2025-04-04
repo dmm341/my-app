@@ -8,9 +8,9 @@ import Dashboard from "./components/Pages/Dashboard";
 import Analytics from "./components/Pages/Analytics";
 import NotFound from "./components/NotFound"; // Add this component
 import Farmers from "./components/Pages/Farmers";
-import NewOrder from "./components/Pages/NewOrder";
+import NewOrder from "./components/Pages/new order/NewOrder";
 import Buyers from "./components/Pages/Buyers";
-import NewSale from "./components/Pages/NewSale";
+import NewSale from "./components/Pages/NewSale/NewSale";
 
 const App = () => {
   return (

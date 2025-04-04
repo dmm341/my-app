@@ -353,8 +353,11 @@ useEffect(() => {
                 <th className="px-4 py-3 border">Name</th>
                 <th className="px-4 py-3 border">Contact</th>
                 <th className="px-4 py-3 border">Location</th>
-                <th className="px-4 py-3 border">Avocado Type</th>
-                <th className="px-4 py-3 border">Total Fruits</th>
+                <th className="px-4 py-3 border">hass fruits</th>
+                <th className="px-4 py-3 border">hass money</th>
+                <th className="px-4 py-3 border">Fuerte Fruits</th>
+                <th className="px-4 py-3 border">Fuerte money</th>
+                <th className="px-4 py-3 border">Total fruits</th>
                 <th className="px-4 py-3 border">Total Money</th>
                 <th className="px-4 py-3 border">Actions</th>
               </tr>
@@ -366,7 +369,10 @@ useEffect(() => {
                   <td className="px-4 py-3 border">{farmer.name}</td>
                   <td className="px-4 py-3 border">{farmer.contact}</td>
                   <td className="px-4 py-3 border">{farmer.location}</td>
-                  <td className="px-4 py-3 border">{farmer.avocado_type}</td>
+                  <td className="px-4 py-3 border">{farmer.hass_fruits}</td>
+                  <td className="px-4 py-3 border">{farmer.hass_money}</td>
+                  <td className="px-4 py-3 border">{farmer.fuerte_fruits}</td>
+                  <td className="px-4 py-3 border">{farmer.fuerte_money}</td>
                   <td className="px-4 py-3 border">{farmer.total_fruits}</td>
                   <td className="px-4 py-3 border">
                     Ksh{farmer.total_money ? farmer.total_money.toFixed(2) : "0.00"}

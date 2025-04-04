@@ -94,6 +94,7 @@ const NewSale = () => {
         toast.success("Sale recorded successfully!");
         fetchSales();
         resetForm();
+        setShowForm(false);
       } else {
         toast.error("Failed to process sale.");
       }
