@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import OrderService from "../new order/OrderApi";
+import OrderService from "./OrderApi"; 
 
 const NewOrderForm = ({ onOrderCreated }) => {
   const [formData, setFormData] = useState({
@@ -14,7 +14,6 @@ const NewOrderForm = ({ onOrderCreated }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fetchingFarmers, setFetchingFarmers] = useState(false);
-
   // Fetch farmers when component mounts
   useEffect(() => {
     const fetchFarmers = async () => {
@@ -35,7 +34,6 @@ const NewOrderForm = ({ onOrderCreated }) => {
 
     fetchFarmers();
   }, []);
-
   // Update farmerId when customerName changes
   useEffect(() => {
     if (formData.customerName) {
@@ -48,12 +46,10 @@ const NewOrderForm = ({ onOrderCreated }) => {
       }
     }
   }, [formData.customerName, farmers]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -61,10 +57,8 @@ const NewOrderForm = ({ onOrderCreated }) => {
       setError("Please fill in all required fields");
       return;
     }
-
     setLoading(true);
     setError(null);
-    
     try {
       const totalAmount = formData.numberOfFruits * formData.pricePerFruit;
       const orderData = { ...formData, totalAmount };
@@ -84,7 +78,6 @@ const NewOrderForm = ({ onOrderCreated }) => {
       setLoading(false);
     }
   };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-md shadow-md">
       {error && <p className="text-red-500">{error}</p>}
@@ -100,7 +93,6 @@ const NewOrderForm = ({ onOrderCreated }) => {
           className="w-full p-2 border rounded bg-gray-100"
         />
       </div>
-      
       <div>
         <label className="block text-sm font-medium text-gray-700">Avocado Type</label>
         <select
@@ -113,7 +105,6 @@ const NewOrderForm = ({ onOrderCreated }) => {
           <option value="Fuerte">Fuerte</option>
         </select>
       </div>
-      
       {/* Farmer dropdown (showing names from farmers table) */}
       <div>
         <label className="block text-sm font-medium text-gray-700">Farmer Name</label>
@@ -136,7 +127,7 @@ const NewOrderForm = ({ onOrderCreated }) => {
           </select>
         )}
       </div>
-      
+      {/* Number of fruits */}
       <div>
         <label className="block text-sm font-medium text-gray-700">Number of Fruits</label>
         <input
@@ -150,7 +141,7 @@ const NewOrderForm = ({ onOrderCreated }) => {
           className="w-full p-2 border rounded"
         />
       </div>
-      
+      {/* Price per fruit */}
       <div>
         <label className="block text-sm font-medium text-gray-700">Price per Fruit</label>
         <input
@@ -165,6 +156,7 @@ const NewOrderForm = ({ onOrderCreated }) => {
           className="w-full p-2 border rounded"
         />
       </div>
+      {/* Total amount */}
       <div>
         <label className="block text-sm font-medium text-gray-700">total_amount</label>
         <input
@@ -175,7 +167,7 @@ const NewOrderForm = ({ onOrderCreated }) => {
           className="w-full p-2 border rounded"
         />
       </div>
-      
+      {/* Submit button */}
       <button
         type="submit"
         disabled={loading || fetchingFarmers}
@@ -186,5 +178,4 @@ const NewOrderForm = ({ onOrderCreated }) => {
     </form>
   );
 };
-
 export default NewOrderForm;

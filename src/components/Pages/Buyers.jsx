@@ -248,6 +248,18 @@ const Buyers = () => {
               <th className="px-4 py-3 border cursor-pointer" onClick={() => handleSort("location")}>
                 Location <FaSort className="inline" />
               </th>
+              <th className="px-4 py-3 border cursor-pointer" onClick={() => handleSort("hass_fruits")}>
+                hass_fruits <FaSort className="inline" />
+              </th>
+              <th className="px-4 py-3 border cursor-pointer" onClick={() => handleSort("hass_money")}>
+                hass_money <FaSort className="inline" />
+              </th>
+              <th className="px-4 py-3 border cursor-pointer" onClick={() => handleSort("fuerte_fruits")}>
+                Fuerte Fruits <FaSort className="inline" />
+              </th>
+              <th className="px-4 py-3 border cursor-pointer" onClick={() => handleSort("fuerte_money")}>
+                Fuerte Money <FaSort className="inline" />
+              </th>
               <th className="px-4 py-3 border cursor-pointer" onClick={() => handleSort("total_fruits")}>
                 Total Fruits <FaSort className="inline" />
               </th>
@@ -263,6 +275,10 @@ const Buyers = () => {
                 <td className="px-4 py-3 border">{buyer.name}</td>
                 <td className="px-4 py-3 border">{buyer.contact}</td>
                 <td className="px-4 py-3 border">{buyer.location}</td>
+                <td className="px-4 py-3 border">{buyer.hass_fruits}</td>
+                <td className="px-4 py-3 border">{buyer.hass_money}</td>
+                <td className="px-4 py-3 border">{buyer.fuerte_fruits}</td>
+                <td className="px-4 py-3 border">{buyer.fuerte_money}</td>
                 <td className="px-4 py-3 border">{buyer.total_fruits}</td>
                 <td className="px-4 py-3 border">{buyer.total_money}</td>
                 <td className="px-4 py-3 border">
