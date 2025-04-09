@@ -1,84 +1,78 @@
-const API_URL ="http://localhost:5000/sales";
-const SaleService = {
+const API_URL= "http://localhost:5000/Sales"
+const SaleService ={
   /**
-   * Create a new sale
-   * @param {Object} saleData - Sale details
+   * create a new sale
+   * @param {object} SaleData -sale details
    */
-  createSale: async (saleData) => {
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+  createSale: async(SaleData)=> {
+    try{
+      const response = await fetch(API_URL,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
         },
-        body: JSON.stringify(saleData),
+        body:JSON.stringify(SaleData),
       });
-
-      if (!response.ok) {
+      if (!response.ok){
         throw await response.json();
       }
       return await response.json();
-    } catch (error) {
-      throw error.message || "Failed to create sale.";
+    }catch (error){
+      throw error.message || "failed to create sale";
     }
   },
-
   /**
-   * Get all sales
+   * get all sales
    */
-  getSales: async () => {
-    try {
-      const response = await fetch(API_URL);
-      if (!response.ok) {
+  getSales:async ()=>{
+    try{
+      const response=await fetch(API_URL);
+      if (!response.ok){
         throw await response.json();
       }
       return await response.json();
-    } catch (error) {
-      throw error.message || "Failed to fetch sales.";
+    }catch (error) {
+      throw error.message || "failed to fetch sales";
     }
   },
-
   /**
-   * Update an existing sale
-   * @param {string} saleId - Sale ID
-   * @param {Object} updatedData - Updated sale details
+   * update an existing order 
+   * @param {string} SaleId -saleid
+   * @param {object} updatedData -updated sale details
    */
-  updateSale: async (saleId, updatedData) => {
+  updateSale: async(SaleId,updatedData)=>{
     try {
-      const response = await fetch(`${API_URL}/${saleId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
+      const response =await fetch(`${API_URL}/${SaleId}`,{
+        method:"put",
+        headers:{
+          "Content-Type" : "application/json",
         },
-        body: JSON.stringify(updatedData),
+        body:JSON.stringify(updatedData),
       });
-
-      if (!response.ok) {
+      if (!response.ok){
         throw await response.json();
       }
       return await response.json();
-    } catch (error) {
-      throw error.message || "Failed to update sale.";
+    }catch (error) {
+      throw error.message || "failed to update sale";
     }
   },
   /**
-   * Delete a sale
-   * @param {string} saleId - Sale ID
+   * delete a sale
+   * @param {string} SaleId -Sale id
    */
-  deleteSale: async (saleId) => {
+  deleteSale:async(SaleId) =>{
     try {
-      const response = await fetch(`${API_URL}/${saleId}`, {
-        method: "DELETE",
+      const response= await fetch(`${API_URL}/${SaleId}`,{
+        method:"DELETE",
       });
-
-      if (!response.ok) {
+      if (!response.ok){
         throw await response.json();
       }
       return await response.json();
-    } catch (error) {
-      throw error.message || "Failed to delete sale.";
+    }catch (error) {
+      throw error.message || "failed to delete sale";
     }
   },
 };
 export default SaleService;
-

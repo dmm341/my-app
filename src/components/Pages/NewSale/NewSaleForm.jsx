@@ -8,7 +8,8 @@ const NewSaleForm = ({ onSaleCreated }) => {
     avocadoType: "Hass",
     numberOfFruits: "",
     pricePerFruit: "",
-    totalAmount: ""
+    totalAmount: "",
+    sale_date: new Date().toISOString().split('T')[0] 
   });
   const [buyers, setBuyers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -68,7 +69,8 @@ const NewSaleForm = ({ onSaleCreated }) => {
         avocadoType: "Hass",
         numberOfFruits: "",
         pricePerFruit: "",
-        totalAmount: ""
+        totalAmount: "",
+        sale_date: new Date().toISOString().split('T')[0]
       });
         onSaleCreated();
       } catch (error) {

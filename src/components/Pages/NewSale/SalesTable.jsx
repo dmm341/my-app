@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import SaleService from './SaleApi'; 
-import { FaEdit, FaTrash, FaSync, FaSearch, FaSort, FaSortUp, FaSortDown, FaAngleLeft, FaAngleRight, FaAngleDoubleLeft, FaAngleDoubleRight, } from 'react-icons/fa';
-
+import { 
+  FaEdit, 
+  FaTrash, 
+  FaSync, 
+  FaSearch, 
+  FaSort, 
+  FaSortUp, 
+  FaSortDown, 
+  FaAngleLeft, 
+  FaAngleRight, 
+  FaAngleDoubleLeft, 
+  FaAngleDoubleRight 
+} from 'react-icons/fa';
 const SalesTable = () => {
   const [sales, setSales] = useState([]);
   const [filteredSales, setFilteredSales] = useState([]);
@@ -20,6 +31,13 @@ const SalesTable = () => {
     pricePerFruit: '',
     totalAmount: ''
   });
+  const requestSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -223,7 +241,16 @@ const SalesTable = () => {
                   onClick={() => requestSort(header.key)}
                 >
                   <div className="flex items-center justify-center">
-                    {header.label} {FaSort(header.key)}
+                  {header.label} 
+{sortConfig.key === header.key ? (
+  sortConfig.direction === 'asc' ? (
+    <FaSortUp className="ml-1" />
+  ) : (
+    <FaSortDown className="ml-1" />
+  )
+) : (
+  <FaSort className="ml-1 text-gray-400" />
+)}
                   </div>
                 </th>
               ))}

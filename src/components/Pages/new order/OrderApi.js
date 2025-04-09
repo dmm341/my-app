@@ -1,5 +1,4 @@
 const API_URL = "http://localhost:5000/orders";
-
 const OrderService = {
   /**
    * Create a new order
@@ -14,17 +13,14 @@ const OrderService = {
         },
         body: JSON.stringify(orderData),
       });
-
       if (!response.ok) {
         throw await response.json();
-      }
-      
+      }      
       return await response.json();
     } catch (error) {
       throw error.message || "Failed to create order.";
     }
   },
-
   /**
    * Get all orders
    */
@@ -39,7 +35,6 @@ const OrderService = {
       throw error.message || "Failed to fetch orders.";
     }
   },
-
   /**
    * Update an existing order
    * @param {string} orderId - Order ID
@@ -54,17 +49,14 @@ const OrderService = {
         },
         body: JSON.stringify(updatedData),
       });
-
       if (!response.ok) {
         throw await response.json();
       }
-      
       return await response.json();
     } catch (error) {
       throw error.message || "Failed to update order.";
     }
   },
-
   /**
    * Delete an order
    * @param {string} orderId - Order ID
@@ -74,16 +66,13 @@ const OrderService = {
       const response = await fetch(`${API_URL}/${orderId}`, {
         method: "DELETE",
       });
-
       if (!response.ok) {
         throw await response.json();
       }
-
       return await response.json();
     } catch (error) {
       throw error.message || "Failed to delete order.";
     }
   },
 };
-
 export default OrderService;
