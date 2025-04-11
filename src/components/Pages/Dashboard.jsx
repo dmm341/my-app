@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FaUsers, FaShoppingBasket, FaMoneyBillWave } from "react-icons/fa";
+import { FaUsers, FaShoppingBasket, FaMoneyBillWave,FaTruck,FaCashRegister,FaBoxes, FaBalanceScale, FaExclamationTriangle } from "react-icons/fa";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import {url} from "../../utils/baseUrl"; // Import the base URL from utils
 
 const Dashboard = () => {
   const [farmers, setFarmers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false); // Refresh state to trigger re-fetch
-
+  const [buyers, setbuyers] = useState([]);
   // Fetch farmers data
   const fetchFarmers = async () => {
     try {
-      const response = await fetch("http://localhost:5000/farmers");
+      const response = await fetch(`${url}/farmers`); 
       const data = await response.json();
       setFarmers(data);
       setLoading(false);
@@ -20,18 +21,37 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+  const fetchBuyers = async () => {
+    try {
+      const response = await fetch(`${url}/buyers`);
+      const data = await response.json();
+      setbuyers(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching buyers:", error);
+      setLoading(false);
+    }
+  };
+
 
   // Fetch farmers data and re-fetch when `refresh` state changes
   useEffect(() => {
     setLoading(true);
     fetchFarmers();
   }, [refresh]);
+  useEffect(() => {
+    setLoading(true);
+    fetchBuyers();
+  }, [refresh]);
 
   // Calculate totals
   const totalFarmers = farmers.length;
   const totalFruits = farmers.reduce((sum, farmer) => sum + farmer.total_fruits, 0);
   const totalMoney = farmers.reduce((sum, farmer) => sum + farmer.total_money, 0);
-
+  const totalBuyers = buyers.length;
+  const totalBuyersFruits = buyers.reduce((sum, buyer) => sum + buyer.total_fruits, 0);
+  const totalBuyersMoney = buyers.reduce((sum, buyer) => sum + buyer.total_money, 0);
+  const stockBalance = totalFruits - totalBuyersFruits; 
   // Data for the chart
   const chartData = farmers.map((farmer) => ({
     name: farmer.name,
@@ -77,7 +97,45 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+        <div className="bg-blue-300 p-6 rounded-lg shadow-md">
+          <div className="flex items-center space-x-4">
+            < FaTruck className="text-4xl text-blue-700" />
+            <div>
+              <p className="text-gray-600">Total  buyers</p>
+              <p className="text-2xl font-bold text-blue-700"> {totalBuyers}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-blue-300 p-6 rounded-lg shadow-md">
+          <div className="flex items-center space-x-4">
+            <FaCashRegister className="text-4xl text-blue-700" />
+            <div>
+              <p className="text-gray-600">total fruits sold</p>
+              <p className="text-2xl font-bold text-blue-700">{totalBuyersFruits}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-blue-300 p-6 rounded-lg shadow-md">
+          <div className="flex items-center space-x-4">
+            <FaMoneyBillWave className="text-4xl text-blue-700" />
+            <div>
+              <p className="text-gray-600">Total sales</p>
+              <p className="text-2xl font-bold text-blue-700">Ksh{totalBuyersMoney.toFixed(2)}</p>
+            </div>
+          </div>
+        </div>
       </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4 ">
+    <div className="bg-red-300 p-6 rounded-lg shadow-md flex justify-center md:col-span-2">
+          <div className="flex items-center space-x-4">
+            <FaBalanceScale className="text-4xl text-red-700" />
+            <div>
+              <p className="text-gray-600">fruit Stock Balance</p>
+              <p className="text-2xl font-bold text-red-700">{stockBalance}</p>
+            </div>
+          </div>
+          </div>
+    </div>
 
       {/* Quick Actions */}
       <div className="mb-8 flex space-x-4">
