@@ -1,24 +1,29 @@
-const API_URL= "http://localhost:5000/Sales"
+const API_URL= "http://localhost:5000/sales"
 const SaleService ={
   /**
    * create a new sale
    * @param {object} SaleData -sale details
    */
-  createSale: async(SaleData)=> {
-    try{
-      const response = await fetch(API_URL,{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json",
+  createSale: async (saleData) => {
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        body:JSON.stringify(SaleData),
+        body: JSON.stringify(saleData),
       });
-      if (!response.ok){
-        throw await response.json();
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Server error response:", errorData);
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
+      
       return await response.json();
-    }catch (error){
-      throw error.message || "failed to create sale";
+    } catch (error) {
+      console.error("Network error:", error);
+      throw error;
     }
   },
   /**

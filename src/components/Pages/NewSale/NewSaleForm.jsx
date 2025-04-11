@@ -50,18 +50,31 @@ const NewSaleForm = ({ onSaleCreated }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
- const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!formData.buyerName || !formData.numberOfFruits || !formData.pricePerFruit) {
       alert("Please fill in all required fields.");
       return;
     }
+  
     setLoading(true);
     setError(null);
+    
     try {
       const totalAmount = formData.numberOfFruits * formData.pricePerFruit;
-      const saleData = {...formData, totalAmount };
+      const saleData = {
+        buyerId: formData.buyerId,
+        buyerName: formData.buyerName,
+        avocadoType: formData.avocadoType,
+        numberOfFruits: parseInt(formData.numberOfFruits),
+        pricePerFruit: parseFloat(formData.pricePerFruit),
+        totalAmount: totalAmount,
+        sale_date: new Date().toISOString().slice(0, 19).replace('T', ' ') // MySQL format
+      };
+      
+      console.log("Submitting sale data:", saleData); // Debug log
+      
       await SaleService.createSale(saleData);
       setFormData({
         buyerId: "",
@@ -72,12 +85,13 @@ const NewSaleForm = ({ onSaleCreated }) => {
         totalAmount: "",
         sale_date: new Date().toISOString().split('T')[0]
       });
-        onSaleCreated();
-      } catch (error) {
-        setError(error.message || "Failed to create sale");
-      } finally {
-        setLoading(false);
-      }
+      onSaleCreated();
+    } catch (error) {
+      console.error("Sale creation error:", error);
+      setError(error.message || "Failed to create sale");
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-md shadow-md">
