@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaUsers, FaShoppingBasket, FaMoneyBillWave,FaTruck,FaCashRegister,FaBoxes, FaBalanceScale, FaExclamationTriangle } from "react-icons/fa";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import {url} from "../../utils/baseUrl"; // Import the base URL from utils
 
 const Dashboard = () => {
@@ -52,13 +51,7 @@ const Dashboard = () => {
   const totalBuyersFruits = buyers.reduce((sum, buyer) => sum + buyer.total_fruits, 0);
   const totalBuyersMoney = buyers.reduce((sum, buyer) => sum + buyer.total_money, 0);
   const stockBalance = totalFruits - totalBuyersFruits; 
-  // Data for the chart
-  const chartData = farmers.map((farmer) => ({
-    name: farmer.name,
-    fruits: farmer.total_fruits,
-    money: farmer.total_money,
-  }));
-
+  
   // Function to manually refresh data
   const handleRefresh = () => {
     setRefresh((prev) => !prev); // Toggle refresh state to trigger re-fetch
@@ -69,7 +62,7 @@ const Dashboard = () => {
       <h2 className="text-3xl font-bold text-green-700 mb-6">Dashboard</h2>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-8">
         <div className="bg-green-100 p-6 rounded-lg shadow-md">
           <div className="flex items-center space-x-4">
             <FaUsers className="text-4xl text-green-700" />
@@ -78,8 +71,8 @@ const Dashboard = () => {
               <p className="text-2xl font-bold text-green-700">{totalFarmers}</p>
             </div>
           </div>
-        </div>
-        <div className="bg-green-100 p-6 rounded-lg shadow-md">
+         </div>
+         <div className="bg-green-100 p-6 rounded-lg shadow-md">
           <div className="flex items-center space-x-4">
             <FaShoppingBasket className="text-4xl text-green-700" />
             <div>
@@ -87,8 +80,8 @@ const Dashboard = () => {
               <p className="text-2xl font-bold text-green-700">{totalFruits}</p>
             </div>
           </div>
-        </div>
-        <div className="bg-green-100 p-6 rounded-lg shadow-md">
+         </div>
+         <div className="bg-green-100 p-6 rounded-lg shadow-md">
           <div className="flex items-center space-x-4">
             <FaMoneyBillWave className="text-4xl text-green-700" />
             <div>
@@ -96,8 +89,8 @@ const Dashboard = () => {
               <p className="text-2xl font-bold text-green-700">Ksh{totalMoney.toFixed(2)}</p>
             </div>
           </div>
-        </div>
-        <div className="bg-blue-300 p-6 rounded-lg shadow-md">
+         </div>
+         <div className="bg-blue-300 p-6 rounded-lg shadow-md">
           <div className="flex items-center space-x-4">
             < FaTruck className="text-4xl text-blue-700" />
             <div>
@@ -157,20 +150,12 @@ const Dashboard = () => {
         >
           🔄 Refresh Data
         </button>
+        <Link
+          to="Buyers"
+          className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-lg shadow-md transition"
+          >View buyers</Link> 
       </div>
-
-      {/* Chart */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Fruits Purchased from Farmers</h3>
-        <BarChart width={800} height={300} data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="fruits" fill="#4CAF50" />
-        </BarChart>
-      </div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
       {/* Best Farmers Table */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-xl font-bold text-gray-800 mb-4">Best Farmers</h3>
@@ -200,6 +185,37 @@ const Dashboard = () => {
           </table>
         </div>
       </div>
+      {/* Best Buyers Table */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h3 className="text-xl font-bold text-gray-800 mb-4">Best Buyers</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full border border-gray-400 shadow-md rounded-lg overflow-hidden">
+            <thead>
+              <tr className="bg-blue-700 text-white border border-gray-400">
+                <th className="px-4 py-3 border">Buyer</th>
+                <th className="px-4 py-3 border">Fruits</th>
+                <th className="px-4 py-3 border">Money</th>
+                <th className="px-4 py-3 border">Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              {buyers
+                .sort((a, b) => b.total_money - a.total_money)
+                .slice(0, 5)
+                .map((buyer) => (
+                  <tr key={buyer.id} className="border text-center">
+                    <td className="px-4 py-3 border">{buyer.name}</td>
+                    <td className="px-4 py-3 border">{buyer.total_fruits}</td>
+                    <td className="px-4 py-3 border">Ksh{buyer.total_money}</td>
+                    <td className="px-4 py-3 border">{buyer.location}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+      </div>
+    </div>
+    </div>
+      
     </div>
   );
 };

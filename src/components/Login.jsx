@@ -20,7 +20,7 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem("user", JSON.stringify(data.user)); // Store user details
         alert("Login successful!");
-        navigate("/dashboard"); // Redirect to dashboard
+        navigate("/LayoutSelector"); // Redirect to dashboard
       } else {
         alert(data.message || "Invalid credentials.");
       }
